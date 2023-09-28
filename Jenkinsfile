@@ -5,25 +5,25 @@ pipeline {
     stages{
         stage('Code'){
             steps{
-                git url: 
+                 git branch: 'master', url:'https://github.com/rajdeepsingh642/Django-app-deploy.git'
             }
         }
-        stage('Build and Test'){
+        stage('Build'){
             steps{
-                sh 'docker build . -t trainwithshubham/node-todo-test:latest'
+                 sh 'docker build -t rajdeepsingh642/djangoapp:${BUILD_ID} .'
             }
         }
         stage('Push'){
             steps{
                 withCredentials([usernamePassword(credentialsId: 'dockerHub', passwordVariable: 'dockerHubPassword', usernameVariable: 'dockerHubUser')]) {
         	     sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPassword}"
-                 sh 'docker push trainwithshubham/node-todo-test:latest'
+                 sh 'docker push rajdeepsingh642/djangoapp:${BUILD_ID}'
                 }
             }
         }
         stage('Deploy'){
             steps{
-                sh "docker-compose down && docker-compose up -d"
+                sh "
             }
         }
     }
