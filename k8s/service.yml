@@ -1,0 +1,10 @@
+kind: Service
+metadata:
+  name: my-service
+spec:
+  selector:
+      app: django
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 9376

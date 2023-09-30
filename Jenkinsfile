@@ -15,15 +15,35 @@ pipeline {
         }
         stage('Push'){
             steps{
-                withCredentials([usernamePassword(credentialsId: 'dockerHub', passwordVariable: 'dockerHubPassword', usernameVariable: 'dockerHubUser')]) {
-        	     sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPassword}"
+                withCredentials([string(credentialsId: 'docker_hubss', variable: 'docker_hub')]) {
+
+        	     sh "docker login -u rajdeepsingh642 -p ${docker_hub}"
                  sh 'docker push rajdeepsingh642/djangoapp:${BUILD_ID}'
-                
-            
-                  }
-                }
-      
+                   }
             }
-        }
+        }   
+             stage("Sending k8s file to ansible server"){
+            steps{
+                sshagent(['ansible_host']) {
+                    sh 'ssh -o StrictHostKeyChecking=no raj@192.168.1.29'
+                    sh 'scp /var/lib/jenkins/workspace/django-app/djangoapp/* raj@192.168.1.29:/opt/'
+                  }
+                
+                }
+            }
+        
+        stage('Ansible to configure server'){
+                  steps{
+                    dir('ansible/') {
+                        
+                        sh 'ansible-playbook ansible.yml'
+                        
+                        }
+
+
+                  }
+                 }
+        
     }
     
+}
